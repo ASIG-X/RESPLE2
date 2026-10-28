@@ -358,54 +358,6 @@ class OusterBuff : public MappingBase<pcl::PointXYZINormal>
     int64_t time_offset = 0;
 };
 
-class RobosenseBuff : public MappingBase<pcl::PointXYZINormal>
-{
-  public:
-  RobosenseBuff(rclcpp::Node::SharedPtr &nh, const LidarConfig& lidar_config) : MappingBase<pcl::PointXYZINormal>(nh, lidar_config)
-    {
-        pc_subscription_rs = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
-            this->lidar.topic, 100, std::bind(&RobosenseBuff::RSLidarCallback, this, std::placeholders::_1));              
-    }
-
-    void RSLidarCallback(const sensor_msgs::msg::PointCloud2::SharedPtr rs_msg_in)
-    {
-        this->pc_last->clear();
-        pcl::PointCloud<rs_ros::Point>::Ptr pc_last_rs(new pcl::PointCloud<rs_ros::Point>());
-        pcl::fromROSMsg(*rs_msg_in, *pc_last_rs);
-        size_t plsize = pc_last_rs->size();
-        if (plsize == 0) return;
-        this->pc_last->reserve(plsize);
-        pcl::PointXYZINormal pt;
-        double time_begin_s = pc_last_rs->points[0].timestamp;        
-        for (uint i = 1; i < plsize; i++) {
-            pt.x = pc_last_rs->points[i].x;
-            pt.y = pc_last_rs->points[i].y;
-            pt.z = pc_last_rs->points[i].z;
-            pt.intensity = float ((pc_last_rs->points[i].timestamp - time_begin_s) * 1e3);
-            pt.curvature = pc_last_rs->points[i].intensity;
-            if (pt.curvature < 0.0) continue;
-
-            if (pt.intensity >= 0) {
-                this->pc_last->points.push_back(pt);
-            }
-        }
-        this->pc_last->header.frame_id = this->frame_id;
-        this->pc_last->header.stamp = rclcpp::Time(rs_msg_in->header.stamp).nanoseconds();
-        std::vector<int> indices;
-        pcl::removeNaNFromPointCloud(*this->pc_last, *this->pc_last, indices);
-        if (this->pc_last->points.empty()) return;
-        prepareVisualizationScan();
-        pc_last_ds->header.frame_id = this->frame_id;
-        pc_last_ds->header.stamp = rclcpp::Time(rs_msg_in->header.stamp).nanoseconds();
-        mtx.lock();
-        this->pc_L_buff.push_back(*pc_last_ds);
-        mtx.unlock();
-    }
-
-  private:
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr pc_subscription_rs;
-};
-
 class Mid70AviaBuff : public MappingBase<pcl::PointXYZINormal>
 {
   public:
@@ -1077,9 +1029,7 @@ int main(int argc, char** argv) {
         } else if (!lidar.type.compare("Mid360Boxi")) {
             buffs.push_back(new Mid360BoxiBuff(nh, lidar));
         } else if (!lidar.type.compare("Odin")) {
-            buffs.push_back(new OdinBuff(nh, lidar));
-        } else if (!lidar.type.compare("Robosense")) {
-            buffs.push_back(new RobosenseBuff(nh, lidar));             
+            buffs.push_back(new OdinBuff(nh, lidar));        
         } else {
             exit(1);
         }

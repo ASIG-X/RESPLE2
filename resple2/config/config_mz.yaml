@@ -41,7 +41,7 @@
     img_huber_loss: 3.0
     grid_n_height: 10
     max_allow_err: 10.0
-    pub_img_scale: 0.25
+    pub_img_scale: 0.5
 
     point_filter_num: 1
     nn_thresh: 0.5
@@ -86,4 +86,4 @@
     thresh_kf_translation: 5.0
     ds_kf_voxel: 0.5
     thresh_tf_dist: 5.0
-    if_rbg_map: false
+    if_rbg_map: true

@@ -184,10 +184,7 @@ public:
         resple2::BufferTransferSchedule transfer_schedule;
         resple2::VoxelFilterSelection voxel_selection;
 
-        while (true) {      
-            if (if_finished) {
-                break;
-            }               
+        while (rclcpp::ok()) {
             for (auto& [lidar_name, lidar_data] : meas_data.lidars_data) {
                 Eigen::aligned_vector<pcl::PointXYZINormal> incoming_points;
                 int64_t time_begin = 0;
@@ -334,7 +331,7 @@ public:
                 continue;
             }
 
-            while (!if_finished) {
+            while (rclcpp::ok()) {
                 const bool collected = collectMeasurements();
                 if (!collected) {
                     std::this_thread::sleep_until(transfer_schedule.deadline());
@@ -486,8 +483,6 @@ public:
         }
     }
 
-    void requestStop() { if_finished.store(true); }
-
     EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
 private:
@@ -598,7 +593,6 @@ private:
     std::unordered_map<VOXEL_LOCATION, VoxelOctoTree *> voxel_map;
     std::vector<pointWithVar> pv_list;
 
-    std::atomic<bool> if_finished{false};
     Eigen::Quaterniond q_WI = Eigen::Quaterniond::Identity();
     Eigen::Vector3d p_WI = Eigen::Vector3d::Zero();   
 
@@ -631,7 +625,6 @@ private:
         ImuRobustLoss::validateConfig(param.acc_huber_delta, param.cov_acc);
         std::vector<double> gyro_var = CommonUtils::readParam<std::vector<double>>(nh, "cov_gyro");
         param.cov_gyro << gyro_var.at(0), gyro_var.at(1), gyro_var.at(2);
-        if_finished = false;          
 
         dt_ns = 10000000; // 10 ms initial knot interval (100 Hz).
         double dt_s = double(dt_ns) * 1e-9;
@@ -801,46 +794,7 @@ private:
         lidar_buffs.t_buff.push_back(time_begin);
         lidar_buffs.mtx_pc.unlock();        
         last_t_ns = time_begin + max_ofs_ns;
-    }    
-
-    void RSLidarCallback(const sensor_msgs::msg::PointCloud2::SharedPtr lidar_msg_in)
-    {
-        std::string name = "Robosense";
-        const LidarConfig& lidar = lidars.at(name);        
-        pcl::PointCloud<pcl::PointXYZINormal>::Ptr pc_last(new pcl::PointCloud<pcl::PointXYZINormal>());
-        typename pcl::PointCloud<rs_ros::Point>::Ptr pc_last_rs(new typename pcl::PointCloud<rs_ros::Point>());
-        pcl::fromROSMsg(*lidar_msg_in, *pc_last_rs);
-        size_t plsize = pc_last_rs->size();
-        if (plsize == 0) return;
-        pc_last->reserve(plsize);
-        int64_t time_begin = int64_t(pc_last_rs->points[0].timestamp*1e9);
-        double time_begin_s = pc_last_rs->points[0].timestamp;
-        static int64_t last_t_ns = time_begin;
-        int64_t max_ofs_ns = 0;
-        pcl::PointXYZINormal pt;
-        float blind = lidar.blind;
-        for (unsigned int i = 0; i < plsize; ++i) {
-            if (i % point_filter_num == 0) {
-                pt.x = pc_last_rs->points[i].x;
-                pt.y = pc_last_rs->points[i].y;
-                pt.z = pc_last_rs->points[i].z;
-                pt.intensity = float ((pc_last_rs->points[i].timestamp - time_begin_s) * 1e3);
-                pt.curvature = pc_last_rs->points[i].intensity;
-                if (pt.intensity >= 0 && pt.x*pt.x+pt.y*pt.y+pt.z*pt.z > (blind * blind) && int64_t(pc_last_rs->points[i].timestamp*1e9) > last_t_ns) {
-                    pc_last->points.push_back(pt);
-                    int64_t ofs = int64_t(pc_last_rs->points[i].timestamp*1e9);
-                    max_ofs_ns = max_ofs_ns > ofs ? max_ofs_ns : ofs;
-                }
-            }
-        }
-        sort(pc_last->points.begin(), pc_last->points.end(), &CommonUtils::time_list);
-        LidarData& lidar_buffs = meas_data.lidars_data.at(name);
-        lidar_buffs.mtx_pc.lock();
-        lidar_buffs.pc_buff.push_back(pc_last->points);
-        lidar_buffs.t_buff.push_back(time_begin);
-        lidar_buffs.mtx_pc.unlock();        
-        last_t_ns = max_ofs_ns;
-    }         
+    }        
 
     void livoxLidarCallback(const livox_ros_driver::msg::CustomMsg::SharedPtr livox_msg_in)
     {
@@ -1809,7 +1763,6 @@ int main(int argc, char *argv[])
         rclcpp::spin_some(nh);
         rate.sleep();
     }
-    resple.requestStop();
     opt.join();
     rclcpp::shutdown();
 }

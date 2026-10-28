@@ -79,7 +79,7 @@
     bias_gyro_rw_psd: [0.000002, 0.000002, 0.000002]
     n_iter: 3
 
-    if_loop_closure: true
+    if_loop_closure: false
     w_lc: 10.0
     w_odom: 10.0
     if_loss_func: true

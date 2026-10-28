@@ -7,18 +7,12 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS} -std=c++
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} -std=c++17 -O3 -march=native -mno-avx -mno-avx2 -pthread -fopenmp -Wall -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/" ${CMAKE_MODULE_PATH})
-if(NOT "$ENV{ROS_DISTRO}" STREQUAL "lyrical")
-  set(pinocchio_DIR /usr/local/lib/cmake/pinocchio)
-endif()
+set(pinocchio_DIR /usr/local/lib/cmake/pinocchio)
 get_filename_component(RESPLENU_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 add_definitions(-DRESPLENU_SOURCE_DIR="${RESPLENU_SOURCE_DIR}")
 
-set(RESPLE_ROS_LYRICAL OFF)
 if(DEFINED ENV{ROS_DISTRO} AND "$ENV{ROS_DISTRO}" STREQUAL "humble")
   add_definitions(-DROS_DISTRO_HUMBLE)
-elseif(DEFINED ENV{ROS_DISTRO} AND "$ENV{ROS_DISTRO}" STREQUAL "lyrical")
-  set(RESPLE_ROS_LYRICAL ON)
-  add_definitions(-DROS_DISTRO_LYRICAL)
 else()
   add_definitions(-DROS_DISTRO_JAZZY)
 endif()
@@ -39,9 +33,6 @@ find_package(livox_ros_driver2 REQUIRED)
 find_package(estimate_msgs REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(ament_lint_auto REQUIRED)
-if(RESPLE_ROS_LYRICAL AND NOT TARGET JsonCpp::JsonCpp)
-  find_package(jsoncpp CONFIG REQUIRED)
-endif()
 find_package(PCL REQUIRED)
 find_package(pcl_conversions REQUIRED)
 find_package(tf2_ros REQUIRED)
@@ -97,51 +88,27 @@ add_executable(RESPLE2
 
 target_include_directories(Mapping PRIVATE /usr/local/include)
 target_include_directories(RESPLE2 PRIVATE /usr/local/include)
-if(RESPLE_ROS_LYRICAL)
-  target_link_libraries(${PROJECT_NAME} INTERFACE
-    pinocchio::pinocchio
-    rclcpp::rclcpp
-    ${std_msgs_TARGETS}
-    ${geometry_msgs_TARGETS}
-    ${nav_msgs_TARGETS}
-    ${sensor_msgs_TARGETS}
-    ${visualization_msgs_TARGETS}
-    ${std_srvs_TARGETS}
-    ${livox_interfaces_TARGETS}
-    ${livox_ros_driver_TARGETS}
-    ${livox_ros_driver2_TARGETS}
-    ${estimate_msgs_TARGETS}
-    pcl_conversions::pcl_conversions
-    tf2_ros::tf2_ros
-    cv_bridge::cv_bridge
-    image_transport::image_transport
-    ament_index_cpp::ament_index_cpp
-    ${anymal_msgs_TARGETS}
-    ${unitree_msgs_TARGETS}
-  )
-else()
-  ament_target_dependencies(${PROJECT_NAME} INTERFACE
-    rclcpp
-    std_msgs
-    geometry_msgs
-    nav_msgs
-    sensor_msgs
-    visualization_msgs
-    std_srvs
-    livox_interfaces
-    livox_ros_driver
-    livox_ros_driver2
-    estimate_msgs
-    pcl_conversions
-    ament_lint_auto
-    tf2_ros
-    cv_bridge
-    image_transport
-    ament_index_cpp
-    anymal_msgs
-    unitree_msgs
-  )
-endif()
+ament_target_dependencies(${PROJECT_NAME} INTERFACE
+  rclcpp
+  std_msgs
+  geometry_msgs
+  nav_msgs
+  sensor_msgs
+  visualization_msgs
+  std_srvs
+  livox_interfaces
+  livox_ros_driver
+  livox_ros_driver2
+  estimate_msgs
+  pcl_conversions
+  ament_lint_auto
+  tf2_ros
+  cv_bridge
+  image_transport
+  ament_index_cpp
+  anymal_msgs
+  unitree_msgs
+)
 target_link_libraries(RESPLE2
 		${PROJECT_NAME}
 		${pinocchio_LIBRARIES}
@@ -173,37 +140,20 @@ add_executable(ibtc_online
     src/camera/pinhole_camera.cpp
     src/camera/equidistant_camera.cpp)
 target_include_directories(ibtc_online PRIVATE /usr/local/include)
-if(RESPLE_ROS_LYRICAL)
-  target_link_libraries(ibtc_online
-    rclcpp::rclcpp
-    ${std_msgs_TARGETS}
-    ${geometry_msgs_TARGETS}
-    ${nav_msgs_TARGETS}
-    ${sensor_msgs_TARGETS}
-    ${visualization_msgs_TARGETS}
-    pcl_conversions::pcl_conversions
-    cv_bridge::cv_bridge
-    ${std_srvs_TARGETS}
-    image_transport::image_transport
-    ament_index_cpp::ament_index_cpp
-    ${estimate_msgs_TARGETS}
-  )
-else()
-  ament_target_dependencies(ibtc_online
-    rclcpp
-    std_msgs
-    geometry_msgs
-    nav_msgs
-    sensor_msgs
-    visualization_msgs
-    pcl_conversions
-    cv_bridge
-    std_srvs
-    image_transport
-    ament_index_cpp
-    estimate_msgs
-  )
-endif()
+ament_target_dependencies(ibtc_online
+  rclcpp
+  std_msgs
+  geometry_msgs
+  nav_msgs
+  sensor_msgs
+  visualization_msgs
+  pcl_conversions
+  cv_bridge
+  std_srvs
+  image_transport
+  ament_index_cpp
+  estimate_msgs
+)
 target_link_libraries(ibtc_online
     ${PCL_LIBRARIES}
     ${YAML_CPP_LIBRARIES}

@@ -1,5 +1,5 @@
 import os
-import sys
+import yaml
 import launch
 import launch_ros.actions
 from ament_index_python.packages import get_package_share_directory
@@ -8,7 +8,7 @@ def generate_launch_description():
     config_yaml_fusion = os.path.join(
         get_package_share_directory('resple2'),
         'config',
-        'config_360zed_mid360imu.yaml')
+        'config_mz.yaml')
     config_rviz = os.path.join(
         get_package_share_directory('resple2'),
         'config',
@@ -16,8 +16,12 @@ def generate_launch_description():
     config_ibtc_fusion = os.path.join(
         get_package_share_directory('resple2'),
         'config',
-        'config_360zed_ibtc.yaml')             
-    return launch.LaunchDescription([   
+        'config_mz_ibtc.yaml')
+    with open(config_yaml_fusion, 'r', encoding='utf-8') as config_file:
+        parameters = yaml.safe_load(config_file)['/**']['ros__parameters']
+    if_loop_closure = parameters.get('if_loop_closure', False)
+
+    nodes = [
         launch_ros.actions.Node(
             package='rviz2',
             executable='rviz2',
@@ -39,13 +43,16 @@ def generate_launch_description():
             output='both',
             parameters=[config_yaml_fusion],
             arguments=['--ros-args', '--log-level', 'warn']),
-        launch_ros.actions.Node(
+    ]
+    if if_loop_closure is True:
+        nodes.append(launch_ros.actions.Node(
             package='resple2',
             executable='ibtc_online',
             name='ibtc_online',
             emulate_tty=True,
             output='log',
             parameters=[config_ibtc_fusion, config_yaml_fusion],
-            ros_arguments=['--log-level', 'warn'])                                       
-  ])
+            ros_arguments=['--log-level', 'warn']))
+
+    return launch.LaunchDescription(nodes)
 
