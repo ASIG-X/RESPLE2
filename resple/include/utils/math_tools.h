@@ -1,4 +1,15 @@
+/*
+This file is part of RESPLE2: Inertial-Informed Recursive Non-Uniform Spline Estimation for Multi-Sensor Odometry with Global Refinement.
+ 
+Copyright (c) 2026 Ziyu Cao
 
+Developer: Ziyu Cao <ziyu.cao@liu.se>
+
+For commercial use, please contact me at <ziyu.cao@liu.se> or Kailai Li at <kailai.li@liu.se>.
+
+This file is subject to the terms and conditions outlined in the 'LICENSE' file, 
+which is included as part of this source code package.
+*/
 
 #pragma once
 #define BOOST_VARIANT_LIMIT_TYPES 50
