@@ -58,7 +58,7 @@ For LIO use, set `if_visual: false` and `if_kin: false` in the YAML file selecte
 ```bash
 source install/setup.bash
 ros2 launch resple2 resple_groundtour.launch.py
-# Open another terminal in ~/ros2_ws and run:
+# Open another terminal and run:
 source install/setup.bash
 ros2 bag play /path/to/bag/
 ```
