@@ -2,6 +2,8 @@
 [**YouTube**](https://www.youtube.com/watch?v=6bgAY8SLhvw) | **[arXiv](https://arxiv.org/abs/2610.37602)** | **[Website](https://asig-x.github.io/resple2_web)** | **[Dataset](https://huggingface.co/datasets/ASIG-Lab/RESPLE2-Dataset)**
 
 
+RESPLE2 is a recursive non-uniform B-spline state estimation framework supporting a versatile range of multi-sensor odometry configurations, enabling LiDAR-inertial, LiDAR-visual-inertial (LVIO), LiDAR-leg-inertial (LKIO), and LiDAR-leg-visual-inertial (LKVIO) odometry systems with a unified design with optional global spline correction. All runs comfortably within real-time constraints.
+
 ### BibTex Citation
 ```
 @article{cao2026resple2,
