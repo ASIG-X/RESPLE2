@@ -1,0 +1,89 @@
+/**:
+  ros__parameters:
+    topic_imu: /boxi/livox/imu
+    acc_ratio: false
+    lidars: ["Hesai"]
+    Hesai:
+      topic_lidar: /boxi/hesai/points
+      lidar_type: Hesai
+      scan_line: 32
+      blind: 0.05
+      q_lb: [0.00122352, -0.70514220, 0.70906315, -0.00155726]
+      t_lb: [-0.01919177, -0.00717359, 0.13830923]
+      w_pt: 0.005
+      dept_err: 0.02
+      beam_err: 0.05
+      ds_scan_voxel: 0.5
+      if_dense_map: true
+    lidar_time_offset: 0.0
+    cameras: ["alphasense_front_center"]
+    alphasense_front_center:
+      topic_camera: /boxi/alphasense/front_center/image_raw/compressed
+      topic_info: /boxi/alphasense/front_center/camera_info
+      if_compressed: true
+      if_vignette_correct: true
+      if_undist: false
+      if_camera_info: true
+      cam_model: EquidistantCamera
+      cam_width: 1440
+      cam_height: 1080
+      scale: 1.0
+      q_cb:  [0.547937508448, -0.453434644136, -0.456097975711, -0.53491695326]
+      t_cb:  [0.02411345, -0.20537576, -0.09629272]
+      time_offset: 0.0
+
+    if_visual: true
+    if_kin: true
+
+    img_point_cov: 1000.0
+    img_huber_loss: 3.0
+    grid_n_height: 10
+    max_allow_err: 20.0
+    pub_img_scale: 0.25
+
+    point_filter_num: 1
+    nn_thresh: 0.5
+    lidar_cov_floor: 0.0001
+    coeff_cov: 10.0
+    max_layer: 3
+    min_eigen_value: 0.001
+
+    q_br: [0.00782264, 0.99995174, -0.00594136, -0.00012641]
+    t_br: [-0.38606570, -0.00307188, 0.43142017]
+    cov_kin_vel: 0.01
+    cov_kin_pt2pl: 0.05
+    topic_kin: /anymal/state_estimator/anymal_state
+    model_path: resple2/urdf/anymal.urdf
+
+    min_knot_hz: 10
+    num_imu_upd: 3
+    thresh_p: 1.0
+    thresh_del: 0.5
+    thresh_dv: 0.0
+    num_points_upd: 500
+    geometry_batch:
+      enabled: true
+      check_stride: 64
+      min_information: 10000.0
+      min_eigen_ratio: 0.01
+    pred_acc_cov: [1.0,1.0,1.0]
+    pred_gyro_cov: [0.1,0.1,0.1]
+
+    cov_P0: 0.02
+    cov_RCP_pos_old: 0.1
+    cov_RCP_ort_old: 0.1
+    cov_RCP_pos_new: 0.1
+    cov_RCP_ort_new: 0.1
+    std_sys_pos: 0.1
+    std_sys_ort: 0.1
+    cov_acc: [1.0,1.0,1.0]
+    acc_huber_delta: 0.0
+    cov_gyro: [0.0001,0.0001,0.0001]
+    bias_acc_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_gyro_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_acc_rw_psd: [0.00002, 0.00002, 0.00002]
+    bias_gyro_rw_psd: [0.000002, 0.000002, 0.000002]
+    n_iter: 3
+
+    if_loop_closure: false
+    if_rbg_map: true
