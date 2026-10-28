@@ -1,0 +1,40 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>resple2</name>
+  <version>0.0.0</version>
+
+  <description>RESPLE2</description>
+  <license>GPLv3</license>
+  <author>Ziyu Cao</author>
+  <author>William Talbot</author>
+  <author>Kailai Li</author>
+  <maintainer email="ziyu.cao@liu.se">Ziyu Cao</maintainer>
+  <maintainer email="kailai.li@rug.nl">Kailai Li</maintainer>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  <build_depend>builtin_interfaces</build_depend>
+  <depend>rclcpp</depend>
+  <depend>yaml-cpp</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>nav_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>message_runtime</depend>
+  <depend>livox_ros_driver</depend>  
+  <depend>livox_ros_driver2</depend>
+  <depend>anymal_msgs</depend>  
+  <depend>unitree_msgs</depend>  
+  <depend>livox_interfaces</depend>
+  <depend>estimate_msgs</depend>
+  <depend>pinocchio</depend>
+
+  <test_depend>ament_lint_common</test_depend>
+  <test_depend>ament_lint_auto</test_depend>  
+  <exec_depend>robot_state_publisher</exec_depend>
+  <exec_depend>rviz2</exec_depend>
+  <exec_depend>builtin_interfaces</exec_depend>  
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>  
+</package>

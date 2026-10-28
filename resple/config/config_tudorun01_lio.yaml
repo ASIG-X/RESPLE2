@@ -1,0 +1,74 @@
+/**:
+  ros__parameters:
+    if_custom_ds: true
+    topic_imu: /livox/imu
+    acc_ratio: true 
+    lidars: ["HAP360"]
+    HAP360:
+      topic_lidar: /livox/lidar 
+      lidar_type: HAP360
+      scan_line: 4
+      blind: 0.5
+      q_lb: [1.0, 0.0, 0.0, 0.0]        
+      t_lb: [0.011, 0.02329, -0.04412]  
+      w_pt: 0.01 
+      dept_err: 0.02
+      beam_err: 0.05         
+      ds_scan_voxel: 0.5
+      if_dense_map: true 
+    lidar_time_offset: 0.0
+
+    min_knot_hz: 30
+    if_visual: false
+    if_kin: false
+
+    point_filter_num: 1
+    nn_thresh: 0.5
+    lidar_cov_floor: 0.0001
+    coeff_cov: 5.0
+
+    max_layer: 2
+
+    q_br: [0.0, 1.0, 0.0, 0.0]
+    t_br: [-0.286263, -0.022832, 0.193118]    
+    contact_force_threshold_up: 40.0
+    contact_force_threshold_down: 60.0    
+    cov_kin_vel: 0.01
+    cov_kin_pt2pl: 0.1
+    kin_time_offset_ns: 5000000
+    topic_kin: /lowstate_stamped
+    model_path: resple/urdf/go2_description/urdf/go2.urdf   
+
+    num_imu_upd: 3
+    thresh_p: 1.0
+    thresh_del: 0.2    
+
+    cov_P0: 0.02
+    cov_RCP_pos_old: 0.1
+    cov_RCP_ort_old: 0.1
+    cov_RCP_pos_new: 0.1
+    cov_RCP_ort_new: 0.1
+    std_sys_pos: 0.1
+    std_sys_ort: 0.1
+    cov_acc: [1.0,1.0,1.0]
+    cov_gyro: [0.01,0.01,0.01]     
+    acc_huber_delta: 0.0
+    bias_acc_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_gyro_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_acc_rw_psd: [0.000002, 0.000002, 0.000002]
+    bias_gyro_rw_psd: [0.000002, 0.000002, 0.000002] 
+    n_iter: 3
+    num_points_upd: 500
+    geometry_batch:
+      enabled: true
+      check_stride: 64
+      min_information: 10000.0
+      min_eigen_ratio: 0.01
+    num_threads: 5
+    opencv_num_threads: -1
+    pred_acc_cov: [1.0,1.0,1.0]
+    pred_gyro_cov: [0.1,0.1,0.1]
+
+    if_loop_closure: false    
+
+    ds_gm_scan_voxel: 0.0

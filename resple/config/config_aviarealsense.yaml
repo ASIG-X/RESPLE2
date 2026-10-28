@@ -1,0 +1,139 @@
+/**:
+  ros__parameters:
+    topic_imu: /livox/imu
+    acc_ratio: true
+    lidars:
+    - AviaResple
+    cameras:
+    - realsense
+    AviaResple:
+      topic_lidar: /livox/lidar
+      lidar_type: AviaResple
+      scan_line: 6
+      blind: 0.5
+      q_lb:
+      - 1.0
+      - 0.0
+      - 0.0
+      - 0.0
+      t_lb:
+      - -0.04165
+      - -0.02326
+      - 0.0284
+      w_pt: 0.01
+      beam_err: 0.05
+      dept_err: 0.02
+      ds_scan_voxel: 0.5
+      if_dense_map: true
+    lidar_time_offset: 0.0
+    realsense:
+      topic_camera: /camera/camera/color/image/compressed
+      topic_info: /camera/camera/color/camera_info
+      if_compressed: true
+      if_vignette_correct: false
+      if_undist: true
+      cam_model: Pinhole
+      cam_width: 640
+      cam_height: 480
+      scale: 1.0
+      if_camera_info: false
+      cam_fx: 385.4332275390625
+      cam_fy: 384.946044921875
+      cam_cx: 324.5821533203125
+      cam_cy: 242.63174438476562
+      k1: -0.05476806312799454
+      k2: 0.06623130291700363
+      k3: 0.0001795387506717816
+      k4: 0.0003726476861629635
+      k5: -0.021501122042536736         
+      q_cb:
+      - 0.50237249
+      - 0.50290063
+      - -0.50435343
+      - 0.4902453
+      t_cb:
+      - -0.00581776
+      - -0.03711133
+      - -0.00170726
+      time_offset: 0.0
+    min_knot_hz: 20
+    if_visual: true
+    if_kin: false
+    plot_flag: false
+    img_point_cov: 1000.0
+    img_huber_loss: 5.0
+    if_rbg_map: true
+    grid_n_height: 10
+    max_allow_err: 10.0
+    point_filter_num: 1
+    nn_thresh: 0.5
+    lidar_cov_floor: 0.0001
+    coeff_cov: 5.0
+    max_layer: 2
+    num_imu_upd: 3
+    thresh_p: 1.0
+    thresh_del: 0.5
+    pub_img_scale: 1.0
+    cov_P0: 0.02
+    cov_RCP_pos_old: 0.1
+    cov_RCP_ort_old: 0.1
+    cov_RCP_pos_new: 0.1
+    cov_RCP_ort_new: 0.1
+    std_sys_pos: 0.1
+    std_sys_ort: 0.1
+    cov_acc:
+    - 1.0
+    - 1.0
+    - 1.0
+    acc_huber_delta: 0.0
+    cov_gyro:
+    - 0.0001
+    - 0.0001
+    - 0.0001
+    bias_acc_initial_var:
+    - 0.0002
+    - 0.0002
+    - 0.0002
+    bias_gyro_initial_var:
+    - 0.0002
+    - 0.0002
+    - 0.0002
+    bias_acc_rw_psd:
+    - 2.0e-06
+    - 2.0e-06
+    - 2.0e-06
+    bias_gyro_rw_psd:
+    - 2.0e-06
+    - 2.0e-06
+    - 2.0e-06
+    n_iter: 3
+    num_points_upd: 500
+    geometry_batch:
+      enabled: true
+      check_stride: 64
+      min_information: 10000.0
+      min_eigen_ratio: 0.01
+    num_threads: 5
+    opencv_num_threads: -1
+    pred_acc_cov:
+    - 1.0
+    - 1.0
+    - 1.0
+    pred_gyro_cov:
+    - 0.1
+    - 0.1
+    - 0.1
+    if_loop_closure: true
+    w_lc: 10.0
+    w_odom: 10.0
+    if_loss_func: true
+    loss_func_thresh: 1.0
+    thresh_kf_translation: 5.0
+    ds_kf_voxel: 0.5
+    thresh_tf_dist: 5.0
+    ds_gm_scan_voxel: 0.0
+    map_sliding_en: true
+    half_map_size: 600
+    imu_reliable_qos: true
+    voxel_size: 0.2
+    sliding_thresh: 8.0

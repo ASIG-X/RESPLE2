@@ -1,0 +1,108 @@
+/**:
+  ros__parameters:
+    if_custom_ds: true
+    topic_imu: /odin1/imu
+    acc_ratio: false 
+    lidars: ["Odin"]
+    cameras: ["odincam"]
+    Odin:
+      topic_lidar: /odin1/cloud_raw
+      lidar_type: Odin
+      scan_line: 1
+      blind: 0.5
+      q_lb: [1.0, 0.0, 0.0, 0.0]     
+      t_lb: [0.0254, -0.0330, -0.0221]   
+      w_pt: 0.01
+      beam_err: 0.05
+      dept_err: 0.02      
+      ds_scan_voxel: 0.5
+      if_dense_map: true
+    lidar_time_offset: 0.0
+    odincam:
+      topic_camera: /odin1/image/compressed
+      topic_info: none
+      if_compressed: true
+      if_vignette_correct: false
+      if_undist: false
+      if_camera_info: false
+      cam_model: PolynomialCamera
+      cam_width: 1600
+      cam_height: 1296
+      cam_fx: 727.292
+      cam_fy: 727.196
+      cam_cx: 757.228
+      cam_cy: 662.136
+      k2: -9.94729e-05
+      k3: -0.0243369
+      k4: 0.0304907
+      k5: -0.0449826     
+      k6: 0.0268916
+      k7: -0.00705993
+      skew: -0.127407
+      scale: 1.0
+      q_cb: [0.5014, 0.4975, -0.5012, 0.4999]
+      t_cb: [0.0703, 0.0196, 0.0215] 
+      time_offset: 0.0 
+    lidar_time_offset: 0.0 
+
+    min_knot_hz: 10
+    if_visual: true
+    if_kin: false
+
+    plot_flag: false
+    img_point_cov: 1000.0
+    img_huber_loss: 3.0
+    grid_n_height: 10
+    max_allow_err: 20.0
+
+    point_filter_num: 1
+    nn_thresh: 0.5
+    lidar_cov_floor: 0.01
+    coeff_cov: 10.0
+
+    max_layer: 2     
+
+    num_imu_upd: 6
+    thresh_p: 1.0
+    thresh_del: 0.5
+    pub_img_scale: 0.25
+
+    cov_P0: 0.02
+    cov_RCP_pos_old: 0.1
+    cov_RCP_ort_old: 0.1
+    cov_RCP_pos_new: 0.1
+    cov_RCP_ort_new: 0.1
+    std_sys_pos: 0.1
+    std_sys_ort: 0.1
+    cov_acc: [1.0, 1.0, 1.0]
+    acc_huber_delta: 0.0
+    cov_gyro: [0.0001,0.0001,0.0001]    
+    bias_acc_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_gyro_initial_var: [0.0002, 0.0002, 0.0002]
+    bias_acc_rw_psd: [0.000002, 0.000002, 0.000002]
+    bias_gyro_rw_psd: [0.000002, 0.000002, 0.000002]         
+    n_iter: 3     
+    num_points_upd: 500
+    geometry_batch:
+      enabled: false
+      check_stride: 64
+      min_information: 10000.0
+      min_eigen_ratio: 0.01
+    num_threads: 5
+    opencv_num_threads: -1
+    pred_acc_cov: [1.0,1.0,1.0]
+    pred_gyro_cov: [0.1, 0.1, 0.1]
+
+    if_loop_closure: true
+    w_lc: 10.0
+    w_odom: 10.0
+    if_loss_func: true
+    loss_func_thresh: 1.0     
+    thresh_kf_translation: 5.0
+    ds_kf_voxel: 0.5
+    thresh_tf_dist: 5.0
+    global_max_iter: 20
+
+
+    if_rbg_map: true
+    ds_gm_scan_voxel: 0.5
