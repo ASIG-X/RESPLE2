@@ -103,10 +103,7 @@ public:
                         lidar.topic, 200000, std::bind(&RESPLE2::livoxMid360BoxiCallback, this, std::placeholders::_1));
             } else if (!lidar.type.compare("Odin")) {
                 sub_odin = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
-                        lidar.topic, 200000, std::bind(&RESPLE2::odinCallback, this, std::placeholders::_1));
-            } else if (!lidar.type.compare("Robosense")) {
-                sub_rs = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
-                        lidar.topic, 200000, std::bind(&RESPLE2::RSLidarCallback, this, std::placeholders::_1));                           
+                        lidar.topic, 200000, std::bind(&RESPLE2::odinCallback, this, std::placeholders::_1));                   
             }
         }        
         if (param.if_kin) {
