@@ -7,7 +7,9 @@ set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS} -std=c++
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} -std=c++17 -O3 -march=native -mno-avx -mno-avx2 -pthread -fopenmp -Wall -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/" ${CMAKE_MODULE_PATH})
-set(pinocchio_DIR /usr/local/lib/cmake/pinocchio)
+if(NOT DEFINED pinocchio_DIR)
+  set(pinocchio_DIR /usr/local/lib/cmake/pinocchio)  # override with -Dpinocchio_DIR=...
+endif()
 get_filename_component(RESPLENU_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 add_definitions(-DRESPLENU_SOURCE_DIR="${RESPLENU_SOURCE_DIR}")
 
@@ -111,7 +113,7 @@ ament_target_dependencies(${PROJECT_NAME} INTERFACE
 )
 target_link_libraries(RESPLE2
 		${PROJECT_NAME}
-		${pinocchio_LIBRARIES}
+		pinocchio::pinocchio
 		${PCL_LIBRARIES}
 		${YAML_CPP_LIBRARIES}
 		${OpenMP_LIBS}
@@ -120,7 +122,7 @@ target_link_libraries(RESPLE2
 )
 target_link_libraries(Mapping
 		${PROJECT_NAME}
-		${pinocchio_LIBRARIES}
+		pinocchio::pinocchio
 		${PCL_LIBRARIES}
 		${YAML_CPP_LIBRARIES}
 		${OpenCV_LIBRARIES}

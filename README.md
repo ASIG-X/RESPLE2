@@ -33,7 +33,30 @@ sudo apt install ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-cv-bridge r
 sudo apt install ros-${ROS_DISTRO}-rosbag2-storage-mcap
 ```
 
+#### Pinocchio 3.9.0
+
 Install [Pinocchio](https://github.com/stack-of-tasks/pinocchio#installation) **3.9.0**. Set `pinocchio_DIR` in [CMakeLists.txt](resple2/CMakeLists.txt) to its CMake directory (currently `/usr/local/lib/cmake/pinocchio`).
+
+> [!WARNING]
+> Do **not** use the ROS package `ros-${ROS_DISTRO}-pinocchio`: it currently ships Pinocchio **4.x**, which fails to compile with RESPLE2
+> (`wrong number of template arguments (25, should be at least 0)` in `boost/mpl/list.hpp`).
+> If it is installed, remove it (`sudo apt remove ros-${ROS_DISTRO}-pinocchio`) unless another package needs it,
+> because its headers in `/opt/ros/${ROS_DISTRO}/include` can shadow the 3.9.0 headers.
+
+Build Pinocchio 3.9.0 from source (C++ only, into its own prefix):
+
+```bash
+sudo apt install liburdfdom-dev liburdfdom-headers-dev
+git clone --recursive -b v3.9.0 https://github.com/stack-of-tasks/pinocchio.git
+cd pinocchio && mkdir build && cd build
+cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/pinocchio-3.9 \
+  -DBUILD_WITH_URDF_SUPPORT=ON -DBUILD_PYTHON_INTERFACE=OFF -DBUILD_TESTING=OFF
+make -j$(nproc) && sudo make install
+echo 'export LD_LIBRARY_PATH=/opt/pinocchio-3.9/lib:$LD_LIBRARY_PATH' >> ~/.bashrc
+```
+
+By default [CMakeLists.txt](resple2/CMakeLists.txt) looks for Pinocchio in `/usr/local/lib/cmake/pinocchio`.
+For any other location, pass it at build time: `--cmake-args -Dpinocchio_DIR=/opt/pinocchio-3.9/lib/cmake/pinocchio`.
 
 ### Compilation
 
@@ -43,7 +66,13 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 git clone --recursive https://github.com/ASIG-X/RESPLE2.git
 cd ~/ros2_ws
-colcon build --symlink-install resple2
+colcon build --symlink-install --packages-up-to resple2 --cmake-args -Dpinocchio_DIR=/opt/pinocchio-3.9/lib/cmake/pinocchio   # omit if Pinocchio is in /usr/local
+source install/setup.bash
+```
+
+```bash
+cd ~/ros2_ws/src && git clone https://github.com/ASIG-X/rviz2_plugin_ser2res.git
+cd ~/ros2_ws && colcon build --symlink-install --packages-select rviz2_plugin_ser2res
 source install/setup.bash
 ```
 Global refinement also requires [rviz2_plugin_ser2res](https://github.com/ASIG-X/rviz2_plugin_ser2res) to clear the RViz displays when the map is updated. Clone it into the same workspace's `src/` directory, build it with `colcon build --symlink-install --packages-select rviz2_plugin_ser2res` from the workspace root, and source `install/setup.bash` before launching. The provided RViz configuration already includes this plugin.

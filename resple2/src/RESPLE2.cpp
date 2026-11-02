@@ -104,9 +104,11 @@ public:
             } else if (!lidar.type.compare("Odin")) {
                 sub_odin = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
                         lidar.topic, 200000, std::bind(&RESPLE2::odinCallback, this, std::placeholders::_1));
-            } else if (!lidar.type.compare("Robosense")) {
-                sub_rs = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
-                        lidar.topic, 200000, std::bind(&RESPLE2::RSLidarCallback, this, std::placeholders::_1));                           
+
+                // else if (!lidar.type.compare("Robosense")) {
+                //                 sub_rs = nh->create_subscription<sensor_msgs::msg::PointCloud2>(
+                //                         lidar.topic, 200000, std::bind(&RESPLE2::RSLidarCallback, this, std::placeholders::_1));                           
+
             }
         }        
         if (param.if_kin) {
@@ -494,7 +496,7 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_hesai;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_livox_mid360_boxi;
     rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_odin;
-    rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_rs;
+    //rclcpp::Subscription<sensor_msgs::msg::PointCloud2>::SharedPtr sub_rs;
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_cur_scan;
     rclcpp::Publisher<estimate_msgs::msg::Estimate>::SharedPtr pub_est;
     rclcpp::Publisher<std_msgs::msg::Int64>::SharedPtr pub_start_time;
