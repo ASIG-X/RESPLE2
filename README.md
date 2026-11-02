@@ -33,7 +33,7 @@ sudo apt install ros-${ROS_DISTRO}-pcl-conversions ros-${ROS_DISTRO}-cv-bridge r
 sudo apt install ros-${ROS_DISTRO}-rosbag2-storage-mcap
 ```
 
-Install [Pinocchio](https://github.com/stack-of-tasks/pinocchio#installation) **3.9.0**. Set `pinocchio_DIR` in [CMakeLists.txt](resple2/CMakeLists.txt) to its CMake directory (currently `/usr/local/lib/cmake/pinocchio`).
+Legged-robot kinematics is enabled by default and requires [Pinocchio](https://github.com/stack-of-tasks/pinocchio#installation) **3.9.0**. LIO and LVIO users can build without it by disabling `RESPLE2_ENABLE_KINEMATICS` as shown below. If CMake cannot locate an installed Pinocchio, pass `-Dpinocchio_DIR=/path/to/lib/cmake/pinocchio` under `--cmake-args` when building.
 
 ### Compilation
 
@@ -43,9 +43,23 @@ mkdir -p ~/ros2_ws/src
 cd ~/ros2_ws/src
 git clone --recursive https://github.com/ASIG-X/RESPLE2.git
 cd ~/ros2_ws
-colcon build --symlink-install resple2
+colcon build --symlink-install --packages-up-to resple2
 source install/setup.bash
 ```
+
+To build **without Pinocchio or legged-robot message dependencies**, run from the workspace root:
+
+```bash
+export RESPLE2_ENABLE_KINEMATICS=OFF
+colcon build --symlink-install --packages-up-to resple2 \
+  --cmake-args -DRESPLE2_ENABLE_KINEMATICS=OFF
+source install/setup.bash
+```
+
+Keep `if_kin: false` in the selected YAML configuration. Setting it to `true` in this build produces a startup error explaining how to enable kinematics.
+
+To restore legged-robot support, install Pinocchio, export `RESPLE2_ENABLE_KINEMATICS=ON`, and rebuild with `--cmake-args -DRESPLE2_ENABLE_KINEMATICS=ON`. The YAML `if_kin` parameter still selects whether to use kinematic fusion at runtime.
+
 Global refinement also requires [rviz2_plugin_ser2res](https://github.com/ASIG-X/rviz2_plugin_ser2res) to clear the RViz displays when the map is updated. Clone it into the same workspace's `src/` directory, build it with `colcon build --symlink-install --packages-select rviz2_plugin_ser2res` from the workspace root, and source `install/setup.bash` before launching. The provided RViz configuration already includes this plugin.
 
 

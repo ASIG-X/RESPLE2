@@ -23,11 +23,12 @@
   <depend>message_runtime</depend>
   <depend>livox_ros_driver</depend>  
   <depend>livox_ros_driver2</depend>
-  <depend>anymal_msgs</depend>  
-  <depend>unitree_msgs</depend>  
+  <!-- Unset preserves the default ON build; export OFF before rosdep/colcon to omit these. -->
+  <depend condition="$RESPLE2_ENABLE_KINEMATICS != 'OFF'">anymal_msgs</depend>
+  <depend condition="$RESPLE2_ENABLE_KINEMATICS != 'OFF'">unitree_msgs</depend>
   <depend>livox_interfaces</depend>
   <depend>estimate_msgs</depend>
-  <depend>pinocchio</depend>
+  <depend condition="$RESPLE2_ENABLE_KINEMATICS != 'OFF'">pinocchio</depend>
 
   <test_depend>ament_lint_common</test_depend>
   <test_depend>ament_lint_auto</test_depend>  

@@ -43,8 +43,11 @@ which is included as part of this source code package.
 #include "livox_ros_driver2/msg/custom_msg.hpp"
 #include "estimate_msgs/msg/spline.hpp"
 #include "estimate_msgs/msg/estimate.hpp"
+#if RESPLE2_ENABLE_KINEMATICS
 #include "anymal_msgs/msg/anymal_state.hpp"
 #include <unitree_msgs/msg/low_state_stamped.hpp>
+#include "utils/kinematics.h"
+#endif
 #include "camera/ImgPreprocessing.h"
 #include "utils/math_tools.h"
 #include "Estimator.h"
@@ -106,6 +109,7 @@ public:
                         lidar.topic, 200000, std::bind(&RESPLE2::odinCallback, this, std::placeholders::_1));                   
             }
         }        
+#if RESPLE2_ENABLE_KINEMATICS
         if (param.if_kin) {
             const std::string urdf_filename = model_path;
             pinocchio::urdf::buildModel(urdf_filename, pmodel);
@@ -141,6 +145,7 @@ public:
             }        
             pub_foot_pos = nh->create_publisher<sensor_msgs::msg::PointCloud2>("foot_pos", 20);         
         }        
+#endif
         if (if_visual) { 
             if (camera_data.if_compressed) {
                 sub_cam_comp = nh->create_subscription<sensor_msgs::msg::CompressedImage>(
@@ -505,8 +510,10 @@ private:
     rclcpp::Subscription<sensor_msgs::msg::Image>::SharedPtr sub_cam;
     rclcpp::Subscription<sensor_msgs::msg::CompressedImage>::SharedPtr sub_cam_comp;
     rclcpp::Subscription<sensor_msgs::msg::CameraInfo>::SharedPtr sub_cam_info;
+#if RESPLE2_ENABLE_KINEMATICS
     rclcpp::Subscription<unitree_msgs::msg::LowStateStamped>::SharedPtr sub_go2;
     rclcpp::Subscription<anymal_msgs::msg::AnymalState>::SharedPtr sub_anym;    
+#endif
     CameraConfig camera_data;
     bool if_visual = false;
     std::shared_ptr<VisualFrontend> visual_frontend;
@@ -534,14 +541,16 @@ private:
     resple2::BufferHandoff imu_handoff_, img_handoff_, kin_handoff_;
     int64_t max_time_ns = 0;
 
-    std::shared_ptr<Kinematics> kinematics;
     std::atomic<int64_t> last_kin_ns{0};
-    int64_t kin_time_offset_ns = 0;
 
     rclcpp::Publisher<sensor_msgs::msg::PointCloud2>::SharedPtr pub_foot_pos;
+#if RESPLE2_ENABLE_KINEMATICS
+    std::shared_ptr<Kinematics> kinematics;
+    int64_t kin_time_offset_ns = 0;
     pinocchio::Model pmodel;
     std::shared_ptr<pinocchio::Data> pdata;    
     std::string model_path;    
+#endif
 
     bool if_init_map = false;
 
@@ -595,6 +604,14 @@ private:
 
     void readParameters(rclcpp::Node::SharedPtr &nh)
     {
+        param.if_kin = CommonUtils::readParam<bool>(nh, "if_kin");
+#if !RESPLE2_ENABLE_KINEMATICS
+        if (param.if_kin) {
+            throw std::invalid_argument(
+                "Kinematic support was disabled at build time. Rebuild with "
+                "-DRESPLE2_ENABLE_KINEMATICS=ON or set if_kin: false.");
+        }
+#endif
         param.nn_thresh = CommonUtils::readParam<double>(nh, "nn_thresh");
         acc_ratio = CommonUtils::readParam<bool>(nh, "acc_ratio");
         const auto ba_initial = CommonUtils::readParam<std::vector<double>>(nh, "bias_acc_initial_var", {});
@@ -700,7 +717,7 @@ private:
         } else {
             if_loop_closure = false;
         }
-        param.if_kin =  CommonUtils::readParam<bool>(nh, "if_kin");
+#if RESPLE2_ENABLE_KINEMATICS
         if (param.if_kin) {
             kin_time_offset_ns = CommonUtils::readParam<int64_t>(nh, "kin_time_offset_ns", 0);
             Kinematics::Config kinematics_config;
@@ -718,6 +735,7 @@ private:
             }
             param.cov_kin_pt2pl = CommonUtils::readParam<double>(nh, "cov_kin_pt2pl");
         }     
+#endif
     }
 
     void initFilter(int64_t start_t_ns, Eigen::Vector3d t_init = Eigen::Vector3d::Zero(), Eigen::Quaterniond q_init = Eigen::Quaterniond::Identity())
@@ -1099,6 +1117,7 @@ private:
         last_img_ns = img_t_ns;      
     }    
 
+#if RESPLE2_ENABLE_KINEMATICS
     void getKinematicAnymalCallback(const anymal_msgs::msg::AnymalState::SharedPtr msg)
     {
         static int legInContactForNSteps_[4] = {0};
@@ -1171,6 +1190,8 @@ private:
         });
         last_kin_ns = kin_imu_meas.time_ns;
     }       
+
+#endif
 
     void publishImgRgb(cv::Mat img_rgb, rclcpp::Publisher<sensor_msgs::msg::Image>::SharedPtr pub_img)
     {

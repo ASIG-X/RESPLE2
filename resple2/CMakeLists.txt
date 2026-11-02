@@ -1,13 +1,32 @@
 cmake_minimum_required(VERSION 3.5)
 project(resple2)
 
+set(_kinematics_default ON)
+if(DEFINED ENV{RESPLE2_ENABLE_KINEMATICS})
+  if(NOT "$ENV{RESPLE2_ENABLE_KINEMATICS}" MATCHES "^(ON|OFF)$")
+    message(FATAL_ERROR "RESPLE2_ENABLE_KINEMATICS environment variable must be ON or OFF")
+  endif()
+  set(_kinematics_default "$ENV{RESPLE2_ENABLE_KINEMATICS}")
+endif()
+option(RESPLE2_ENABLE_KINEMATICS "Build legged-robot kinematic support" ${_kinematics_default})
+if(RESPLE2_ENABLE_KINEMATICS)
+  set(_kinematics_enabled ON)
+else()
+  set(_kinematics_enabled OFF)
+endif()
+if(DEFINED ENV{RESPLE2_ENABLE_KINEMATICS} AND
+   NOT "$ENV{RESPLE2_ENABLE_KINEMATICS}" STREQUAL "${_kinematics_enabled}")
+  message(FATAL_ERROR "RESPLE2_ENABLE_KINEMATICS differs between the environment and CMake cache. Pass -DRESPLE2_ENABLE_KINEMATICS=$ENV{RESPLE2_ENABLE_KINEMATICS}")
+endif()
+set(ENV{RESPLE2_ENABLE_KINEMATICS} "${_kinematics_enabled}")
+message(STATUS "RESPLE2 kinematic support: ${_kinematics_enabled}")
+
 set(CMAKE_BUILD_TYPE "DEBUG")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS} -std=c++17 -O3 -march=native -mno-avx -mno-avx2 -pthread -fopenmp -Wall -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} ${OpenMP_CXX_FLAGS} -std=c++17 -O2 -g -march=native -mno-avx -mno-avx2  -pthread -fopenmp -Wall -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} ${OpenMP_CXX_FLAGS} -std=c++17 -O3 -march=native -mno-avx -mno-avx2 -pthread -fopenmp -Wall -DEIGEN_INITIALIZE_MATRICES_BY_NAN")
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake_modules/" ${CMAKE_MODULE_PATH})
-set(pinocchio_DIR /usr/local/lib/cmake/pinocchio)
 get_filename_component(RESPLENU_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/.." ABSOLUTE)
 add_definitions(-DRESPLENU_SOURCE_DIR="${RESPLENU_SOURCE_DIR}")
 
@@ -42,9 +61,11 @@ find_package(cv_bridge REQUIRED)
 
 find_package(image_transport REQUIRED)
 find_package(ament_index_cpp REQUIRED)
-find_package(anymal_msgs REQUIRED)
-find_package(unitree_msgs REQUIRED)
-find_package(pinocchio REQUIRED)
+if(RESPLE2_ENABLE_KINEMATICS)
+  find_package(anymal_msgs REQUIRED)
+  find_package(unitree_msgs REQUIRED)
+  find_package(pinocchio REQUIRED)
+endif()
 find_package(Boost REQUIRED COMPONENTS thread)
 find_package(SuiteSparse REQUIRED MODULE)
 find_package(Ceres REQUIRED)
@@ -69,7 +90,6 @@ include_directories(
 	include
 	${EIGEN3_INCLUDE_DIR}
 	${PCL_INCLUDE_DIRS}
-	${pinocchio_INCLUDE_DIRS}
 	${SUITESPARSE_INCLUDE_DIRS})
 add_executable(Mapping 
 	src/Mapping.cpp 
@@ -85,6 +105,14 @@ add_executable(RESPLE2
 	src/camera/pinhole_camera.cpp 
 	src/VisualFrontend.cpp
 	src/Estimator.cpp)
+
+target_compile_definitions(RESPLE2 PRIVATE
+  RESPLE2_ENABLE_KINEMATICS=$<BOOL:${RESPLE2_ENABLE_KINEMATICS}>)
+if(RESPLE2_ENABLE_KINEMATICS)
+  target_include_directories(RESPLE2 PRIVATE ${pinocchio_INCLUDE_DIRS})
+  target_link_libraries(RESPLE2 ${pinocchio_LIBRARIES})
+  ament_target_dependencies(RESPLE2 anymal_msgs unitree_msgs)
+endif()
 
 target_include_directories(Mapping PRIVATE /usr/local/include)
 target_include_directories(RESPLE2 PRIVATE /usr/local/include)
@@ -106,12 +134,9 @@ ament_target_dependencies(${PROJECT_NAME} INTERFACE
   cv_bridge
   image_transport
   ament_index_cpp
-  anymal_msgs
-  unitree_msgs
 )
 target_link_libraries(RESPLE2
 		${PROJECT_NAME}
-		${pinocchio_LIBRARIES}
 		${PCL_LIBRARIES}
 		${YAML_CPP_LIBRARIES}
 		${OpenMP_LIBS}
@@ -120,7 +145,6 @@ target_link_libraries(RESPLE2
 )
 target_link_libraries(Mapping
 		${PROJECT_NAME}
-		${pinocchio_LIBRARIES}
 		${PCL_LIBRARIES}
 		${YAML_CPP_LIBRARIES}
 		${OpenCV_LIBRARIES}
@@ -166,6 +190,9 @@ install(TARGETS Mapping
   DESTINATION lib/${PROJECT_NAME})
 install(TARGETS ibtc_online
   DESTINATION lib/${PROJECT_NAME})
-ament_export_dependencies(rclcpp yaml-cpp message_runtime livox_ros_driver livox_ros_driver2 livox_interfaces anymal_msgs unitree_msgs)
+ament_export_dependencies(rclcpp yaml-cpp message_runtime livox_ros_driver livox_ros_driver2 livox_interfaces)
+if(RESPLE2_ENABLE_KINEMATICS)
+  ament_export_dependencies(anymal_msgs unitree_msgs)
+endif()
 
 ament_package()
